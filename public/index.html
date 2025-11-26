@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Liteman</title>
+    <link
+      rel="preconnect"
+      href="https://fonts.googleapis.com"
+    />
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: radial-gradient(circle at 20% 20%, #15213b, #0f1625 50%, #0b1220);
+        --panel: #10182a;
+        --panel-2: #131c30;
+        --line: #1f2a3f;
+        --text: #e7edfc;
+        --muted: #8da4c2;
+        --accent: #7cf0c9;
+        --accent-2: #6796ff;
+        --danger: #ff7b7b;
+        --code: #0c1324;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Space Grotesk", "Helvetica Neue", sans-serif;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(10, 16, 30, 0.7);
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        backdrop-filter: blur(8px);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 700;
+        font-size: 20px;
+        letter-spacing: -0.01em;
+      }
+
+      .brand-mark {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #7cf0c9, #6796ff);
+        display: grid;
+        place-items: center;
+        color: #0c1220;
+        font-weight: 800;
+        box-shadow: 0 12px 30px rgba(103, 150, 255, 0.35);
+      }
+
+      .status-dot {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .status-dot span {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 0 6px rgba(124, 240, 201, 0.12);
+      }
+
+      .app {
+        --sidebar-width: 260px;
+        display: grid;
+        grid-template-columns: var(--sidebar-width) 8px 1fr;
+        min-height: calc(100vh - 64px);
+        position: relative;
+      }
+
+      aside {
+        border-right: 1px solid var(--line);
+        padding: 18px 14px;
+        background: rgba(12, 17, 30, 0.6);
+        min-width: 0;
+      }
+
+      main {
+        padding: 18px 20px 40px;
+        min-width: 0;
+      }
+
+      .resize-handle {
+        cursor: col-resize;
+        background: linear-gradient(180deg, rgba(124, 240, 201, 0.1), rgba(103, 150, 255, 0.2));
+      }
+
+      .resize-handle:hover {
+        background: linear-gradient(180deg, rgba(124, 240, 201, 0.25), rgba(103, 150, 255, 0.3));
+      }
+
+      .app.collapsed {
+        grid-template-columns: 0 0 1fr;
+      }
+
+      .app.collapsed aside {
+        display: none;
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+
+      .section-title {
+        margin: 0 0 12px;
+        font-size: 13px;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+      }
+
+      .commands {
+        display: grid;
+        gap: 10px;
+        max-height: calc(100vh - 140px);
+        overflow-y: auto;
+        overflow-x: hidden;
+      }
+
+      .command-card {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 10px 12px;
+        background: var(--panel);
+        cursor: pointer;
+        transition: border 0.15s ease, transform 0.15s ease;
+        overflow: hidden;
+      }
+
+      .command-card:hover {
+        border-color: var(--accent);
+        transform: translateY(-1px);
+      }
+
+      .command-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+      }
+
+      .method-pill {
+        font-size: 11px;
+        padding: 4px 7px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.07);
+        border: 1px solid var(--line);
+        letter-spacing: 0.04em;
+        min-width: 46px;
+        text-align: center;
+      }
+
+      .command-main {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .command-title {
+        font-size: 14px;
+        color: var(--text);
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        white-space: normal;
+        word-break: break-word;
+      }
+
+      .command-url {
+        font-size: 12px;
+        color: var(--muted);
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        white-space: normal;
+        word-break: break-all;
+        margin-top: 2px;
+      }
+
+      .command-actions {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+
+      .icon-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text);
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        font-size: 14px;
+      }
+
+      .icon-btn.danger {
+        border-color: rgba(255, 123, 123, 0.5);
+        color: var(--danger);
+      }
+
+      .chip-btn {
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text);
+        border-radius: 10px;
+        padding: 6px 10px;
+        font-size: 12px;
+        cursor: pointer;
+      }
+
+      .chip-btn.danger {
+        border-color: rgba(255, 123, 123, 0.5);
+        color: var(--danger);
+      }
+
+      .panel {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--panel);
+        padding: 14px;
+        margin-bottom: 14px;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 0.18fr 1fr 0.2fr;
+        gap: 10px;
+        align-items: center;
+      }
+
+      label {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+        display: block;
+        margin-bottom: 6px;
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        border: 1px solid var(--line);
+        background: var(--panel-2);
+        color: var(--text);
+        padding: 11px 12px;
+        border-radius: 10px;
+        font-size: 15px;
+        font-family: "Space Grotesk", "Helvetica Neue", sans-serif;
+        outline: none;
+        transition: border 0.15s ease, box-shadow 0.15s ease;
+        appearance: none;
+      }
+
+      input:focus,
+      select:focus,
+      textarea:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(124, 240, 201, 0.15);
+      }
+
+      select {
+        background-image:
+          linear-gradient(45deg, transparent 50%, var(--accent) 50%),
+          linear-gradient(135deg, var(--accent) 50%, transparent 50%),
+          linear-gradient(to right, var(--panel-2), var(--panel-2));
+        background-position:
+          calc(100% - 20px) 55%,
+          calc(100% - 12px) 55%,
+          0 0;
+        background-size: 8px 8px, 8px 8px, 100% 100%;
+        background-repeat: no-repeat;
+        padding-right: 44px;
+        color: var(--text);
+      }
+
+      select option {
+        background: #1c2437;
+        color: var(--text);
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 120px;
+      }
+
+      .btn {
+        border: none;
+        border-radius: 12px;
+        padding: 12px 16px;
+        font-weight: 700;
+        cursor: pointer;
+        color: #0c1220;
+        background: linear-gradient(135deg, #7cf0c9, #6796ff);
+        transition: transform 0.1s ease, filter 0.2s ease;
+      }
+
+      .btn:hover {
+        transform: translateY(-1px);
+        filter: brightness(1.05);
+      }
+
+      .btn-ghost {
+        background: transparent;
+        border: 1px solid var(--line);
+        color: var(--text);
+      }
+
+      .tabs {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 10px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .tab {
+        padding: 10px 0;
+        cursor: pointer;
+        color: var(--muted);
+        font-weight: 600;
+        position: relative;
+      }
+
+      .tab.active {
+        color: var(--text);
+      }
+
+      .tab.active::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -1px;
+        height: 2px;
+        background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      }
+
+      pre {
+        background: var(--code);
+        color: #e3ecff;
+        padding: 12px;
+        border-radius: 10px;
+        overflow-x: auto;
+        border: 1px solid var(--line);
+        font-family: "IBM Plex Mono", "SFMono-Regular", ui-monospace, monospace;
+        font-size: 14px;
+        margin: 0;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      #response-body {
+        min-height: 260px;
+      }
+
+      .status-ok {
+        color: var(--accent);
+      }
+
+      .status-bad {
+        color: var(--danger);
+      }
+
+      .top-actions {
+        display: flex;
+        gap: 10px;
+        align-items: flex-end;
+      }
+
+      .header-grid {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: 1fr 1fr;
+        margin-top: 8px;
+      }
+
+      .quick-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+        margin: 6px 0;
+      }
+
+      .quick-link {
+        color: var(--accent-2);
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        background: transparent;
+        padding: 4px 0;
+      }
+
+      .flex-between {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+      }
+
+      @media (max-width: 1100px) {
+        .app {
+          grid-template-columns: 1fr;
+        }
+        aside {
+          max-height: 220px;
+          overflow-y: auto;
+        }
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (min-width: 1200px) {
+        .response-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="brand">
+        <div class="brand-mark">⚡</div>
+        <div>
+          Liteman
+          <div style="font-size: 12px; color: var(--muted); line-height: 1.2;">cheeky curl sidekick</div>
+        </div>
+      </div>
+      <div class="status-dot">
+        <span></span>
+        Ready
+      </div>
+    </header>
+
+      <div class="app" id="app-shell">
+      <aside>
+        <div class="flex-between" style="margin-bottom: 12px;">
+          <div class="section-title">COMMANDS</div>
+          <div style="display: flex; gap: 6px;">
+            <button id="toggle-sidebar" class="chip-btn" title="Collapse/Expand">⇆</button>
+            <button id="new-request" class="chip-btn">New</button>
+          </div>
+        </div>
+        <div id="commands" class="commands muted">
+          <p style="margin: 0; padding: 8px;">No commands yet.</p>
+        </div>
+      </aside>
+
+      <div class="resize-handle" id="resize-handle"></div>
+
+      <main>
+        <div class="panel">
+          <div class="form-row">
+            <div>
+              <label for="method">Method</label>
+              <select id="method" name="method">
+                <option>GET</option>
+                <option>POST</option>
+                <option>PUT</option>
+                <option>PATCH</option>
+                <option>DELETE</option>
+              </select>
+            </div>
+            <div>
+              <label for="url">URL</label>
+              <input id="url" name="url" placeholder="https://api.example.com/v1/users" />
+            </div>
+            <div class="top-actions">
+              <button id="send" class="btn" style="width: 100%;">Send →</button>
+            </div>
+          </div>
+
+          <div class="tabs" style="margin-top: 12px;">
+            <div class="tab active" data-tab="headers">Headers</div>
+            <div class="tab" data-tab="body">Body</div>
+          </div>
+
+          <div id="headers-pane">
+            <div class="quick-actions">
+              <button class="quick-link" data-header="Content-Type: application/json">JSON</button>
+              <button class="quick-link" data-header="Content-Type: application/x-www-form-urlencoded">Form</button>
+              <button class="quick-link" data-header="Accept: application/json">Accept JSON</button>
+              <button class="quick-link" data-header="Authorization: Bearer <token>">Bearer</button>
+            </div>
+            <textarea id="headers" placeholder="Authorization: Bearer token&#10;Content-Type: application/json"></textarea>
+          </div>
+
+          <div id="body-pane" style="display: none;">
+            <textarea id="body" placeholder='{"name": "Ada"}'></textarea>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="flex-between" style="margin-bottom: 8px;">
+            <div>
+              <div class="section-title" style="margin-bottom: 2px;">RESPONSE</div>
+              <div id="status" class="muted">Waiting...</div>
+            </div>
+            <div class="command-actions">
+              <button class="chip-btn" id="toggle-pretty">JSON: raw</button>
+            </div>
+          </div>
+          <div class="tabs response-tabs" style="margin-bottom: 10px;">
+            <div class="tab" data-response-tab="headers">Headers</div>
+            <div class="tab active" data-response-tab="body">Body</div>
+          </div>
+          <div id="response-headers-pane" style="display: none;">
+            <label>Headers</label>
+            <pre id="response-headers">—</pre>
+          </div>
+          <div id="response-body-pane">
+            <label>Body</label>
+            <pre id="response-body">—</pre>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      const appShell = document.getElementById("app-shell");
+      const resizeHandle = document.getElementById("resize-handle");
+      const toggleSidebarBtn = document.getElementById("toggle-sidebar");
+      const method = document.getElementById("method");
+      const url = document.getElementById("url");
+      const headersInput = document.getElementById("headers");
+      const bodyInput = document.getElementById("body");
+      const commandsEl = document.getElementById("commands");
+      const statusEl = document.getElementById("status");
+      const responseHeadersEl = document.getElementById("response-headers");
+      const responseBodyEl = document.getElementById("response-body");
+      const responseHeadersPane = document.getElementById("response-headers-pane");
+      const responseBodyPane = document.getElementById("response-body-pane");
+      const responseTabs = Array.from(document.querySelectorAll("[data-response-tab]"));
+      const togglePrettyBtn = document.getElementById("toggle-pretty");
+      const sendBtn = document.getElementById("send");
+      const newRequestBtn = document.getElementById("new-request");
+      const tabs = Array.from(document.querySelectorAll(".tab"));
+      const headersPane = document.getElementById("headers-pane");
+      const bodyPane = document.getElementById("body-pane");
+      const quickLinks = Array.from(document.querySelectorAll(".quick-link"));
+      let commandsCache = [];
+      let dragId = null;
+
+      let lastResponseBody = "";
+      let lastResponseHeaders = {};
+      let pretty = false;
+      togglePrettyBtn.textContent = "JSON: raw";
+
+      const parseHeaders = (text) => {
+        const headers = {};
+        text
+          .split("\n")
+          .map((line) => line.trim())
+          .filter(Boolean)
+          .forEach((line) => {
+            const [key, ...rest] = line.split(":");
+            if (key && rest.length) {
+              headers[key.trim()] = rest.join(":").trim();
+            }
+          });
+        return headers;
+      };
+
+      const headersToText = (headers) =>
+        Object.entries(headers || {})
+          .map(([k, v]) => `${k}: ${v}`)
+          .join("\n");
+
+      const getHeader = (headers, name) => {
+        const key = Object.keys(headers || {}).find((k) => k.toLowerCase() === name.toLowerCase());
+        return key ? headers[key] : undefined;
+      };
+
+      const renderBody = () => {
+        if (pretty) {
+          try {
+            responseBodyEl.textContent = JSON.stringify(JSON.parse(lastResponseBody), null, 2);
+          } catch (err) {
+            responseBodyEl.textContent = lastResponseBody || "—";
+          }
+          togglePrettyBtn.textContent = "JSON: pretty";
+        } else {
+          responseBodyEl.textContent = lastResponseBody || "—";
+          togglePrettyBtn.textContent = "JSON: raw";
+        }
+      };
+
+      const showResponse = (payload) => {
+        const statusValue = typeof payload.status === "number" ? payload.status : Number(payload.status);
+        const statusText = Number.isFinite(statusValue) ? statusValue : (payload.status || "—");
+        const statusClass = Number.isFinite(statusValue) && statusValue >= 200 && statusValue < 400 ? "status-ok" : "status-bad";
+        statusEl.innerHTML = `Status: <span class="${statusClass}">${statusText}</span>`;
+        lastResponseHeaders = payload.response_headers || {};
+        responseHeadersEl.textContent = JSON.stringify(lastResponseHeaders, null, 2);
+        lastResponseBody = payload.response_body || "";
+
+        const contentType = String(getHeader(lastResponseHeaders, "content-type") || "").toLowerCase();
+        pretty = contentType.includes("json");
+        renderBody();
+      };
+
+      const renderCommands = () => {
+        if (!commandsCache.length) {
+          commandsEl.innerHTML = '<p class="muted" style="margin: 0; padding: 8px;">No commands yet.</p>';
+          return;
+        }
+        commandsEl.innerHTML = commandsCache
+          .map(
+            (item) => `
+              <div class="command-card" data-id="${item.id}" data-name="${item.name || ""}" draggable="true">
+                <div class="command-row">
+                  <div class="method-pill">${item.method}</div>
+                  <div class="command-main">
+                    <div class="command-title" title="${item.name || item.url}">${item.name || item.url}</div>
+                    <div class="command-url" title="${item.url}">${item.url}</div>
+                  </div>
+                  <div class="command-actions">
+                    <button class="icon-btn" aria-label="Rename" data-action="rename" data-id="${item.id}">✎</button>
+                    <button class="icon-btn danger" aria-label="Delete" data-action="delete" data-id="${item.id}">✕</button>
+                  </div>
+                </div>
+              </div>
+            `
+          )
+          .join("");
+      };
+
+      const loadCommands = async () => {
+        commandsEl.innerHTML = '<p class="muted" style="margin: 0; padding: 8px;">Loading…</p>';
+        try {
+          const res = await fetch("/api/commands");
+          const data = await res.json();
+          commandsCache = data.history || [];
+          renderCommands();
+        } catch (err) {
+          commandsEl.innerHTML = '<p class="muted" style="margin: 0; padding: 8px;">Failed to load commands.</p>';
+        }
+      };
+
+      const sendRequest = async (payload) => {
+        statusEl.textContent = "Sending...";
+        responseHeadersEl.textContent = "—";
+        responseBodyEl.textContent = "—";
+
+        try {
+          const res = await fetch("/api/send", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          const data = await res.json();
+          showResponse(data);
+          await loadCommands();
+        } catch (err) {
+          statusEl.innerHTML = `<span class="status-bad">Failed: ${err.message}</span>`;
+        }
+      };
+
+      const clearForm = () => {
+        method.value = "GET";
+        url.value = "";
+        headersInput.value = "";
+        bodyInput.value = "";
+      };
+
+      sendBtn.addEventListener("click", async () => {
+        const payload = {
+          method: method.value,
+          url: url.value.trim(),
+          headers: parseHeaders(headersInput.value),
+          body: bodyInput.value,
+        };
+        if (!payload.url) {
+          statusEl.innerHTML = '<span class="status-bad">URL required</span>';
+          return;
+        }
+        await sendRequest(payload);
+      });
+
+      togglePrettyBtn.addEventListener("click", () => {
+        pretty = !pretty;
+        renderBody();
+      });
+
+      newRequestBtn.addEventListener("click", () => {
+        clearForm();
+      });
+
+      commandsEl.addEventListener("click", async (event) => {
+        const action = event.target.getAttribute("data-action");
+        const id = event.target.getAttribute("data-id") || (event.target.closest(".command-card") || {}).dataset?.id;
+        if (!id) return;
+
+        if (action === "rename") {
+            const card = event.target.closest(".command-card");
+            const currentName = card ? card.getAttribute("data-name") || "" : "";
+            const newName = prompt("Name this command", currentName);
+            if (newName !== null) {
+              await fetch("/api/rename", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id, name: newName.trim() }),
+              });
+              await loadCommands();
+            }
+            return;
+          }
+
+        if (action === "delete") {
+          await fetch("/api/delete", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id }),
+          });
+          await loadCommands();
+          return;
+        }
+
+        const entry = commandsCache.find((item) => item.id === id);
+        if (!entry) return;
+
+        method.value = entry.method;
+        url.value = entry.url;
+        headersInput.value = headersToText(entry.headers);
+        bodyInput.value = entry.body || "";
+      });
+
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          tabs.forEach((t) => t.classList.remove("active"));
+          tab.classList.add("active");
+          if (tab.dataset.tab === "headers") {
+            headersPane.style.display = "block";
+            bodyPane.style.display = "none";
+          } else {
+            headersPane.style.display = "none";
+            bodyPane.style.display = "block";
+          }
+        });
+      });
+
+      quickLinks.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const preset = btn.getAttribute("data-header");
+          const headers = parseHeaders(headersInput.value);
+          const [key, ...rest] = preset.split(":");
+          if (key && rest.length) {
+            headers[key.trim()] = rest.join(":").trim();
+            headersInput.value = headersToText(headers);
+          }
+        });
+      });
+
+      // Drag to reorder commands
+      const persistOrder = async () => {
+        const order = commandsCache.map((c) => c.id);
+        await fetch("/api/reorder", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ order }),
+        });
+      };
+
+      commandsEl.addEventListener("dragstart", (e) => {
+        const card = e.target.closest(".command-card");
+        if (!card) return;
+        dragId = card.dataset.id;
+        e.dataTransfer.effectAllowed = "move";
+      });
+
+      commandsEl.addEventListener("dragover", (e) => {
+        const card = e.target.closest(".command-card");
+        if (!card || !dragId) return;
+        e.preventDefault();
+      });
+
+      commandsEl.addEventListener("drop", async (e) => {
+        const card = e.target.closest(".command-card");
+        if (!card || !dragId) return;
+        e.preventDefault();
+        const targetId = card.dataset.id;
+        if (!targetId || targetId === dragId) return;
+        const from = commandsCache.findIndex((c) => c.id === dragId);
+        const to = commandsCache.findIndex((c) => c.id === targetId);
+        if (from === -1 || to === -1) return;
+        const [moved] = commandsCache.splice(from, 1);
+        commandsCache.splice(to, 0, moved);
+        renderCommands();
+        await persistOrder();
+      });
+
+      commandsEl.addEventListener("dragend", () => {
+        dragId = null;
+      });
+
+      responseTabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          responseTabs.forEach((t) => t.classList.remove("active"));
+          tab.classList.add("active");
+          if (tab.dataset.responseTab === "headers") {
+            responseHeadersPane.style.display = "block";
+            responseBodyPane.style.display = "none";
+          } else {
+            responseHeadersPane.style.display = "none";
+            responseBodyPane.style.display = "block";
+          }
+        });
+      });
+
+      // Sidebar resize / collapse
+      const minWidth = 180;
+      const maxWidth = 520;
+      let isDragging = false;
+
+      const setSidebarWidth = (px) => {
+        const clamped = Math.min(maxWidth, Math.max(minWidth, px));
+        appShell.style.setProperty("--sidebar-width", `${clamped}px`);
+        localStorage.setItem("liteman-sidebar-width", String(clamped));
+      };
+
+      const savedWidth = Number(localStorage.getItem("liteman-sidebar-width"));
+      if (Number.isFinite(savedWidth)) {
+        setSidebarWidth(savedWidth);
+      }
+
+      resizeHandle.addEventListener("mousedown", (e) => {
+        isDragging = true;
+        document.body.style.userSelect = "none";
+      });
+
+      window.addEventListener("mousemove", (e) => {
+        if (!isDragging || appShell.classList.contains("collapsed")) return;
+        const newWidth = e.clientX;
+        setSidebarWidth(newWidth);
+      });
+
+      window.addEventListener("mouseup", () => {
+        if (isDragging) {
+          isDragging = false;
+          document.body.style.userSelect = "";
+        }
+      });
+
+      toggleSidebarBtn.addEventListener("click", () => {
+        const collapsed = appShell.classList.toggle("collapsed");
+        if (collapsed) {
+          localStorage.setItem("liteman-sidebar-collapsed", "1");
+        } else {
+          localStorage.removeItem("liteman-sidebar-collapsed");
+        }
+      });
+
+      if (localStorage.getItem("liteman-sidebar-collapsed") === "1") {
+        appShell.classList.add("collapsed");
+      }
+
+      loadCommands();
+    </script>
+  </body>
+</html>
